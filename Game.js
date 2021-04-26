@@ -33,6 +33,7 @@
             this.shooting = false;
             this.oneShot = false;
             this.isGameOver = false;
+            this.bomb=3;
          this.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
             for(var i = 0; i<this.maxEnemies; i++){
                 new Enemy();
@@ -77,7 +78,7 @@
           e.preventDefault();
             }
         },
-    
+        //뗏다
         buttonUp: function(e){
             if(e.keyCode === 32){
                 Game.shooting = false;
@@ -87,11 +88,18 @@
             if(e.keyCode === 37 || e.keyCode === 65){
                 Game.player.movingLeft = false;
             }
+            if(e.keyCode === 38 || e.keyCode === 65){
+                Game.player.movingUp = false;
+            }
             if(e.keyCode === 39 || e.keyCode === 68){
                 Game.player.movingRight = false;
             }
+            if(e.keyCode === 40 || e.keyCode === 65){
+                Game.player.movingDown = false;
+            }
+
         },
-    
+        //눌렀다
         buttonDown: function(e){
             if(e.keyCode === 32){
                 Game.shooting = true;
@@ -100,9 +108,17 @@
             if(e.keyCode === 37 || e.keyCode === 65){
                 Game.player.movingLeft = true;
             }
+            //위, a
+            if(e.keyCode === 38 || e.keyCode === 65){
+                Game.player.movingUp = true;
+            }
             //우, d
             if(e.keyCode === 39 || e.keyCode === 68){
                 Game.player.movingRight = true;
+            }
+            //아래, a
+            if(e.keyCode === 40 || e.keyCode === 65){
+                Game.player.movingDown = true;
             }
         },
     
@@ -139,7 +155,7 @@
             this.paused = false;
       },
     
-    
+    //종료시 뜨는 화면
       gameOver: function(){
           this.isGameOver = true;
           this.clear();
@@ -154,12 +170,14 @@
           this.ctx.font = "bold 16px Lato, sans-serif";
           this.ctx.fillText(message3, this.c.width/2 - this.ctx.measureText(message3).width/2, this.c.height/2 + 30);
       },
-    
+    //점수 갱신
       updateScore: function(){
           this.ctx.fillStyle = "white";
           this.ctx.font = "16px Lato, sans-serif";
           this.ctx.fillText("Score: " + this.score, 8, 20);
           this.ctx.fillText("Lives: " + (this.maxLives - this.life), 8, 40);
+          this.ctx.fillText("Bomb: " + this.bomb, 8, 60);
+          this.ctx.fillText("x,y: " + Game.player.x+","+Game.player.y, 8, 80);
       },
       
         loop: function(){
@@ -204,15 +222,17 @@
     
     
     
-    
+    //플레이어값 설정
     var Player = function(){
-        this.width = 60;
-        this.height = 20;
+        this.width = 40;
+        this.height = 40;
         this.x = Game.c.width/2 - this.width/2;
         this.y = Game.c.height - this.height;
         this.movingLeft = false;
         this.movingRight = false;
-        this.speed = 8;
+        this.movingUp = false;
+        this.movingDown = false;
+        this.speed = 6;
         this.invincible = false;
         this.color = "white";
     };
@@ -228,10 +248,11 @@
         }
     };
     
-    
+    //캐릭터 그림 생성
     Player.prototype.draw = function(){
-        Game.ctx.fillStyle = this.color;
-        Game.ctx.fillRect(this.x, this.y, this.width, this.height);
+        var img=new Image();
+        img.src="plane.png";
+        Game.ctx.drawImage(img,this.x, this.y, this.width, this.height);
     };
     
     
@@ -242,6 +263,12 @@
         if(this.movingRight && this.x + this.width < Game.c.width){
             this.x += this.speed;
         }
+        if(this.movingUp && this.y > 0){
+            this.y -= this.speed;
+        }
+        if(this.movingDown && this.y + this.height < Game.c.height){
+            this.y += this.speed;
+        }       
         if(Game.shooting && Game.currentFrame % 10 === 0){
             this.shoot();
         }
@@ -256,7 +283,8 @@
     
     
     Player.prototype.shoot = function(){
-        Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width/2);
+        //Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width/2);
+        Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width/2,this.y+this.height/2);
         Game.bulletIndex++;
     };
     
@@ -265,12 +293,13 @@
     
     
     
-    var Bullet = function(x){  
-        this.width = 8;
-        this.height = 20;
+    var Bullet = function(x,y){  
+        this.width = 6;
+        this.height = 15;
         this.x = x;
-        this.y = Game.c.height - 10;
-        this.vy = 8;
+        //this.y = Game.c.height - 10;
+        this.y = y;
+        this.vy = 5;
         this.index = Game.bulletIndex;
         this.active = true;
         this.color = "white";
@@ -295,13 +324,13 @@
     
     
     
-    
+    //적 생성
     var Enemy = function(){
         this.width = 60;
         this.height = 20;
         this.x = Game.random(0, (Game.c.width - this.width));
         this.y = Game.random(10, 40);
-        this.vy = Game.random(1, 3) * .1;
+        this.vy = Game.random(1, 4) * .1;
         this.index = Game.enemyIndex;
         Game.enemies[Game.enemyIndex] = this;
         Game.enemyIndex++;
@@ -370,11 +399,11 @@
     };
     
     var EnemyBullet = function(x, y, color){
-        this.width = 8;
-        this.height = 20;
+        this.width = 6;
+        this.height = 15;
         this.x = x;
         this.y = y;
-        this.vy = 6;
+        this.vy = 3;
         this.color = color;
         this.index = Game.enemyBulletIndex;
         Game.enemyBullets[Game.enemyBulletIndex] = this;
@@ -395,7 +424,7 @@
     
     
     
-    
+    //적 지속생성
     var Particle = function(x, y, color){
         this.x = x;
         this.y = y;
