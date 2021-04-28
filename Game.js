@@ -1,4 +1,4 @@
-(function(window){
+(function(){
     var startGame=0;
     var Game = {
     //값 초기화
