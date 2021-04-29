@@ -1,700 +1,714 @@
 <link rel="stylesheet" type="text/css" href="game.css">
 <div class="container">
-	<div class="game-wrap">
-		<canvas width="1000px" height="500" id="game"></canvas>
-		<script>
-			(function(){
-            var startGame=0;
-            var Round=1;
-            var power = 1;
-            var indexck=[];
-            var kill = 0;
-            var clear = 0;
-            var RoundCount=0;
-            var hp;
-            var bosscount=0;
-            var Game = {
-            //값 초기화
-        init: function(){
-            this.c = document.getElementById("game");
-            this.c.width = this.c.width;
-            this.c.height = this.c.height;
-            this.ctx = this.c.getContext("2d");
-            this.killcount=0;
-            Round=1; // 라운드
-            RoundCount=0; // 라운드 한번만 체킹되ㅑ게 하는 플래그
-            hp=2000; // 보스 체력
-            kill=0; // 플레이어 킬수
-            power=1;
-            bosscount=0;
-            clear=0;
-            this.color = "rgba(0,0,0,.7)";
-            this.bullets = [];            
-            this.enemyBullets = [];
-            this.enemies = [];
-            this.Boss;
-            this.particles = [];
-            this.bulletIndex = 0;
-            this.enemyBulletIndex = 0;
-            this.enemyIndex = 0;
-            this.particleIndex = 0;
-            this.maxParticles = 10;
-            this.maxEnemies = 6;
-            this.enemiesAlive = 0;
-            this.currentFrame = 0;
-            this.maxLives = 3;
-            this.life = 0;
-            this.binding();
-            this.player = new Player();
-            this.score = 0;
-            this.paused = false;
-            this.shooting = false;
-            this.oneShot = false;
-            this.isGameOver = false;
-            this.EnemyCount=0;
-            this.bomb=3;
-            this.bombNow=0;
-            this.bombcount=0;
-            if(startGame==0)this.gameStart();
-            else{
-         this.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;         
-            
-            for(var i = 0; i<Game.maxEnemies; i++){
-                if(Game.enemiesAlive<Game.maxEnemies){
-                    setTimeout(function(){
-                        new Enemy();
-                    }, 2000);
-                }
-            }
-            
-            this.invincibleMode(2000);
-    
-            this.loop();
-        }
-        },
-    //키 이벤트 등록
-        binding: function(){
-            window.addEventListener("keydown", this.buttonDown);
-            window.addEventListener("keyup", this.buttonUp);
-            window.addEventListener("keypress", this.keyPressed);
-            this.c.addEventListener("click", this.clicked);
-        },
-    //마우스 클릭시
-        clicked: function(){
-            if(!Game.paused) {
-                Game.pause();
-            } else {
-                if(Game.isGameOver){
-                    Game.init();
-                } else {
-                    Game.unPause();
-                    Game.loop();
-                    Game.invincibleMode(1000);
-                }
-            }
-        },
-    //눌린상태
-        keyPressed: function(k){            
-            if(k.keyCode === 32){
-                if(!Game.player.invincible  && !Game.oneShot){
-                    Game.player.shoot();
-                    Game.oneShot = true;
-                }
-                if(Game.isGameOver){
-                    Game.init();
-                }
-          k.preventDefault();
-            }
-        },
-        //뗏다
-        buttonUp: function(k){
-            if(k.keyCode === 32){
-                Game.shooting = false;
-                Game.oneShot = false;
-        ke.preventDefault();
-            }
-            if( k.keyCode === 65){
-                Game.player.movingLeft = false;
-            }
-            if( k.keyCode === 87){
-                Game.player.movingUp = false;
-            }
-            if( k.keyCode === 68){
-                Game.player.movingRight = false;
-            }
-            if( k.keyCode === 83){
-                Game.player.movingDown = false;
-            }
+    <div class="game-wrap">
+        <canvas width="1000px" height="500" id="game"></canvas>
+        <script>
+            (function () {
+                var startGame = 0;
+                var Round = 1;
+                var power = 1;
+                var indexck = [];
+                var kill = 0;
+                var clear = 0;
+                var RoundCount = 0;
+                var hp;
+                var bosscount = 0;
+                var Game = {
+                    //값 초기화
+                    init: function () {
+                        this.c = document.getElementById("game");
+                        this.c.width = this.c.width;
+                        this.c.height = this.c.height;
+                        this.ctx = this.c.getContext("2d");
+                        this.killcount = 0;
+                        Round = 1; // 라운드
+                        RoundCount = 0; // 라운드 한번만 체킹되ㅑ게 하는 플래그
+                        hp = 2000; // 보스 체력
+                        kill = 0; // 플레이어 킬수
+                        power = 1;
+                        bosscount = 0;
+                        clear = 0;
+                        this.color = "rgba(0,0,0,.7)";
+                        this.bullets = [];
+                        this.enemyBullets = [];
+                        this.enemies = [];
+                        this.Boss;
+                        this.particles = [];
+                        this.bulletIndex = 0;
+                        this.enemyBulletIndex = 0;
+                        this.enemyIndex = 0;
+                        this.particleIndex = 0;
+                        this.maxParticles = 10;
+                        this.maxEnemies = 6;
+                        this.enemiesAlive = 0;
+                        this.currentFrame = 0;
+                        this.maxLives = 3;
+                        this.life = 0;
+                        this.binding();
+                        this.player = new Player();
+                        this.score = 0;
+                        this.paused = false;
+                        this.shooting = false;
+                        this.oneShot = false;
+                        this.isGameOver = false;
+                        this.EnemyCount = 0;
+                        this.bomb = 2;
+                        this.bombNow = 0;
+                        this.bombcount = 0;
+                        if (startGame == 0) this.gameStart();
+                        else {
+                            this.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
 
-        },
-        //눌렀다
-        buttonDown: function(k){
-            if(k.keyCode === 32){
-                Game.shooting = true;
-            }
-            //폭탄키 쉬프트
-            if(k.keyCode === 16 && Game.bomb>0){
-                Game.bomb--;
-                for(var i in Game.enemies){     
-                    Game.enemies[i].Colid=1;               
-                    Game.enemies[i].die();
-                }
-                Game.invincibleMode(2500);
-                k.preventDefault();
-            }
-            //좌, a
-            if( k.keyCode === 65){
-                Game.player.movingLeft = true;
-            }
-            //위, w
-            if( k.keyCode === 87){
-                Game.player.movingUp = true;
-            }
-            //우, d
-            if( k.keyCode === 68){
-                Game.player.movingRight = true;
-            }
-            //아래, s
-            if( k.keyCode === 83){
-                Game.player.movingDown = true;
-            }
-        },
-    
-        random: function(min, max){
-        return Math.floor(Math.random() * (max - min) + min);
-      },
-    //무적판정
-      invincibleMode: function(s){
-          this.player.invincible = true;
-          setTimeout(function(){
-              Game.player.invincible = false;
-          }, s);
-      },
-      //충돌
-      collision: function(a, b){
-            return !(
-            ((a.y + a.height) < (b.y)) ||
-            (a.y > (b.y + b.height)) ||
-            ((a.x + a.width) < b.x) ||
-            (a.x > (b.x + b.width))
-            )
-        },
-        //화면 정리
-      clear: function(){
-          this.ctx.fillStyle = Game.color;
-          this.ctx.fillRect(0, 0, this.c.width, this.c.height);
-      },
-       //정지, 정지해제
-      pause: function(){
-            this.paused = true;
-      },
-    
-      unPause: function(){
-            this.paused = false;
-      },
-      //시작전 뜨는 화면
-      gameStart: function(){
-          startGame++;
-        this.isGameOver = true;
-        this.clear();
-        var message = "Shooting Game";
-        var message2 = "Click or press Spacebar to Play";
-        this.pause();
-        this.ctx.fillStyle = "white";
-        this.ctx.font = "40px Lato,fantasy";
-        this.ctx.fillText(message, this.c.width/2 - this.ctx.measureText(message).width/2, this.c.height/2 - 40);
-        this.ctx.fillText(message2, this.c.width/2 - this.ctx.measureText(message2).width/2, this.c.height/2 - 4);
-        },
-    //종료시 뜨는 화면
-      gameOver: function(){
-          this.isGameOver = true;
-          this.clear();
-          if(clear==0)
-            var message = "Game Over";
-          else 
-            var message = "Game Clear!!";
-          var message2 = "Score :  " + Game.score;
-          var message3 = "Click or Press Spacebar to Play Again";
-          this.pause();
-          this.ctx.fillStyle = "white";
-          this.ctx.font = "40px Lato,fantasy";
-          this.ctx.fillText(message, this.c.width/2 - this.ctx.measureText(message).width/2, this.c.height/2 - 40);
-          this.ctx.fillText(message2, this.c.width/2 - this.ctx.measureText(message2).width/2, this.c.height/2 - 4);
-          this.ctx.font = "20px Lato, fantasy";
-          this.ctx.fillText(message3, this.c.width/2 - this.ctx.measureText(message3).width/2, this.c.height/2 + 20);
-      },
-    //점수 갱신
-      updateScore: function(){
-        if(hp<=0){
-            clear=1;
-            this.gameOver();
-        }
-          this.ctx.fillStyle = "white";
-          this.ctx.font = "20px, fantasy";
-          
-          this.ctx.fillText("Score: " + Game.score, 8, 20);
-          this.ctx.fillText("Lives: " + (Game.maxLives - Game.life), 8, 40);
-          this.ctx.fillText("Bomb: " + Game.bomb, 8, 60);
-          this.ctx.font = "40px, fantasy";
-          if(this.score>1000 && RoundCount==0){
-            RoundCount=1;
-            Round=2;              
-            Game.maxEnemies=9;
-            var temp=Game.enemiesAlive;
-            for(var i=temp;i<Game.maxEnemies;i++){
-                if(Game.enemiesAlive<Game.maxEnemies){
-                    setTimeout(function(){
-                        new Enemy();
-                    }, 2000);
-                }
-            }
-          }
-          else if(this.score>2000 && RoundCount==1){
-            RoundCount=2;
-            Round=3;                 
-            for(var i in Game.enemies){
-                var currentEnemy = Game.enemies[i];
-                currentEnemy.die();
-            }              
-            Game.maxEnemies=0;
-            Game.enemiesAlive=0;            
-            new Boss();                              
-          }
-          if(Round<3){
-            this.ctx.fillText("Round: " + Round, 450, 50);
-          }
-          else if(Round>=3){
-                if(hp<1500&& Round ==3){
-                    Round=4;
-                    Game.maxEnemies=3;
-                    for(var i=0;i<Game.maxEnemies;i++){
-                        setTimeout(function(){
-                            new Enemy();
-                        }, 2000);                        
-                    }
-                    
-                }
-                if( hp<500 && Round==4){
-                    Round=5;
-                    Game.maxEnemies=6;
-                    var temp=Game.enemiesAlive;
-                    for(var i=temp;i<Game.maxEnemies;i++){
-                        if(Game.enemiesAlive<Game.maxEnemies){
-                            setTimeout(function(){
-                                new Enemy();
-                            }, 2000);
-                        }       
-                    }                    
-                }
-                Game.ctx.fillText("Boss Round",400,50);
-                for(var i = 0 ; i<= hp/50 ; i++){
-                    this.ctx.fillText("ㅁ",20*i,10);
-                }
-            }
-        },
-      //계속해서 Game Function들 호출해주는 Function
-        loop: function(){
-            Game.killcount=0;
-            if(!Game.paused){
-                Game.clear();                
-                if(Round!=3){
-                    if(Game.maxEnemies<Game.enemiesAlive)Game.killcount=Game.enemiesAlive-Game.maxEnemies;
-                    for(var i in Game.enemies){
-                        var currentEnemy = Game.enemies[i];
-                        if(Game.killcount==0){ 
-                            currentEnemy.draw();
-                            currentEnemy.update();
-                            if(Game.currentFrame % currentEnemy.shootingSpeed === 0){
-                                currentEnemy.shoot();
+                            for (var i = 0; i < this.maxEnemies; i++) {
+                                setTimeout(function () {
+                                    new Enemy();
+
+                                }, 2000);
+                                
+                            }
+
+                            this.invincibleMode(2000);
+
+                            this.loop();
+                        }
+                    },
+                    //키 이벤트 등록
+                    binding: function () {
+                        window.addEventListener("keydown", this.buttonDown);
+                        window.addEventListener("keyup", this.buttonUp);
+                        window.addEventListener("keypress", this.keyPressed);
+                        this.c.addEventListener("click", this.clicked);
+                    },
+                    //마우스 클릭시
+                    clicked: function () {
+                        if (!Game.paused) {
+                            Game.pause();
+                        } else {
+                            if (Game.isGameOver) {
+                                Game.init();
+                            } else {
+                                Game.unPause();
+                                Game.loop();
+                                Game.invincibleMode(500);
                             }
                         }
-                        else{   // 비동기처리로인해서 마리수가 초과시 자동삭제기능
-                            currentEnemy.die();
-                            Game.killcount--;
+                    },
+                    //눌린상태
+                    keyPressed: function (k) {
+                        if (k.keyCode === 32) {
+                            if (!Game.player.invincible && !Game.oneShot) {
+                                Game.player.shoot();
+                                Game.oneShot = true;
+                            }
+                            if (Game.isGameOver) {
+                                Game.init();
+                            }
+                            k.preventDefault();
+                        }
+                    },
+                    //뗏다
+                    buttonUp: function (k) {
+                        if (k.keyCode === 32) {
+                            Game.shooting = false;
+                            Game.oneShot = false;
+                            ke.preventDefault();
+                        }
+                        if (k.keyCode === 65) {
+                            Game.player.movingLeft = false;
+                        }
+                        if (k.keyCode === 87) {
+                            Game.player.movingUp = false;
+                        }
+                        if (k.keyCode === 68) {
+                            Game.player.movingRight = false;
+                        }
+                        if (k.keyCode === 83) {
+                            Game.player.movingDown = false;
+                        }
+
+                    },
+                    //눌렀다
+                    buttonDown: function (k) {
+                        if (k.keyCode === 32) {
+                            Game.shooting = true;
+                        }
+                        //폭탄키 쉬프트
+                        if (k.keyCode === 16 && Game.bomb > 0) {
+                            Game.bomb--;
+                            for (var i in Game.enemies) {
+                                Game.enemies[i].Colid = 1;
+                                Game.enemies[i].die();
+                            }
+                            Game.invincibleMode(2500);
+                            k.preventDefault();
+                        }
+                        //좌, a
+                        if (k.keyCode === 65) {
+                            Game.player.movingLeft = true;
+                        }
+                        //위, w
+                        if (k.keyCode === 87) {
+                            Game.player.movingUp = true;
+                        }
+                        //우, d
+                        if (k.keyCode === 68) {
+                            Game.player.movingRight = true;
+                        }
+                        //아래, s
+                        if (k.keyCode === 83) {
+                            Game.player.movingDown = true;
+                        }
+                    },
+
+                    random: function (min, max) {
+                        return Math.floor(Math.random() * (max - min) + min);
+                    },
+                    //무적판정
+                    invincibleMode: function (s) {
+                        this.player.invincible = true;
+                        setTimeout(function () {
+                            Game.player.invincible = false;
+                        }, s);
+                    },
+                    //충돌
+                    collision: function (a, b) {
+                        return !(
+                            ((a.y + a.height) < (b.y)) ||
+                            (a.y > (b.y + b.height)) ||
+                            ((a.x + a.width) < b.x) ||
+                            (a.x > (b.x + b.width))
+                        )
+                    },
+                    //화면 정리
+                    clear: function () {
+                        this.ctx.fillStyle = Game.color;
+                        this.ctx.fillRect(0, 0, this.c.width, this.c.height);
+                    },
+                    //정지, 정지해제
+                    pause: function () {
+                        this.paused = true;
+                    },
+
+                    unPause: function () {
+                        this.paused = false;
+                    },
+                    //시작전 뜨는 화면
+                    gameStart: function () {
+                        startGame++;
+                        this.isGameOver = true;
+                        this.clear();
+                        var message = "Shooting Game";
+                        var message2 = "Click or press Spacebar to Play";
+                        this.pause();
+                        this.ctx.fillStyle = "white";
+                        this.ctx.font = "40px Lato,fantasy";
+                        this.ctx.fillText(message, this.c.width / 2 - this.ctx.measureText(message).width / 2, this.c.height / 2 - 40);
+                        this.ctx.fillText(message2, this.c.width / 2 - this.ctx.measureText(message2).width / 2, this.c.height / 2 - 4);
+                    },
+                    //종료시 뜨는 화면
+                    gameOver: function () {
+                        this.isGameOver = true;
+                        this.clear();
+                        if (clear == 0)
+                            var message = "Game Over";
+                        else
+                            var message = "Game Clear!!";
+                        var message2 = "Score :  " + Game.score;
+                        var message3 = "Click or Press Spacebar to Play Again";
+                        this.pause();
+                        this.ctx.fillStyle = "white";
+                        this.ctx.font = "40px Lato,fantasy";
+                        this.ctx.fillText(message, this.c.width / 2 - this.ctx.measureText(message).width / 2, this.c.height / 2 - 40);
+                        this.ctx.fillText(message2, this.c.width / 2 - this.ctx.measureText(message2).width / 2, this.c.height / 2 - 4);
+                        this.ctx.font = "20px Lato, fantasy";
+                        this.ctx.fillText(message3, this.c.width / 2 - this.ctx.measureText(message3).width / 2, this.c.height / 2 + 20);
+                    },
+                    //점수 갱신
+                    updateScore: function () {
+
+                        this.ctx.fillStyle = "white";
+                        this.ctx.font = "20px Lato, fantasy";
+
+                        this.ctx.fillText("Score: " + Game.score, 10, 400);
+                        this.ctx.fillText("Lives: " + (Game.maxLives - Game.life), 10, 420);
+                        this.ctx.fillText("Bomb: " + Game.bomb, 10, 440);
+                        this.ctx.fillText("Max: " + Game.maxEnemies, 10, 460);
+                        this.ctx.fillText("alive: " + Game.enemiesAlive, 10, 480);
+                        this.ctx.fillText("RC: " + RoundCount, 10, 500);
+                        this.ctx.font = "40px Lato, fantasy";
+
+                        if (Round < 3) {
+                            this.ctx.fillText("Round: " + Round, 450, 50);
+                        }
+                        else if (Round >= 3) {
+                            Game.ctx.fillText("Boss Round", 400, 50);
+                            this.ctx.font = "10px Lato, fantasy";
+                            for (var i = 0; i <= hp / 20; i++) {
+                                this.ctx.fillText("ㅁ", 10 * i, 10);
+                            }
+                        }
+                    },
+                    //계속해서 Game Function들 호출해주는 Function
+                    loop: function () {
+                        Game.killcount = 0;
+                        if (!Game.paused) {
+                            Game.clear();
+                            if (hp <= 0) {
+                                clear = 1;
+                                Game.gameOver();
+                            }
+                            if (Game.score > 1000 && RoundCount == 0) {//1천점 이상시 2라운드
+                                RoundCount = 1;
+                                Round = 2;
+                                Game.maxEnemies = 9;
+                                for (var i = 0; i < 3; i++) {
+                                    if (Game.enemiesAlive < Game.maxEnemies) {
+                                        setTimeout(function () {
+                                            new Enemy();
+                                            
+                                        }, 2000);
+                                        
+                                    }
+                                }
+                            }
+                            else if (Game.score > 2500 && RoundCount == 1) { // 보스라운드 진입
+                                RoundCount = 2;
+                                Round = 3;
+                                for (var i in Game.enemies) {
+                                    var currentEnemy = Game.enemies[i];
+                                    currentEnemy.die();
+                                }
+                                Game.maxEnemies = 0;
+                                Game.enemiesAlive = 0;
+                                new Boss();
+                            }
+                            if (Round >= 3) {  //보스라운드
+                                if (hp < 1500 && Round == 3) {
+                                    Round = 4;
+                                    Game.maxEnemies = 3;
+                                    for (var i in Game.enemies) {
+                                        var currentEnemy = Game.enemies[i];
+                                        currentEnemy.die();
+                                    }
+                                    for (var i = 0; i < Game.maxEnemies; i++) {
+                                        setTimeout(function () {
+                                            new Enemy();
+                                            
+                                        }, 2000);
+                                        
+                                    }
+
+                                }
+                                if (hp < 500 && Round == 4) {
+                                    Round = 5;
+                                    Game.maxEnemies = 6;
+                                    var temp = Game.enemiesAlive;
+                                    for (var i = temp; i < Game.maxEnemies; i++) {
+                                        if (Game.enemiesAlive < Game.maxEnemies) {
+                                            setTimeout(function () {
+                                                new Enemy();
+                                                
+                                            }, 2000);
+                                            
+                                            
+                                        }
+                                    }
+                                }
+                            }
+                            if (Round != 3) {
+                                for (var i in Game.enemies) {
+                                    var currentEnemy = Game.enemies[i];
+                                    currentEnemy.draw();
+                                    currentEnemy.update();
+                                    if (Game.currentFrame % currentEnemy.shootingSpeed === 0) {
+                                        currentEnemy.shoot();
+                                    }
+
+                                }
+                            }
+                            else if (Round == 3) {
+                                for (var i in Game.enemies) {
+                                    var currentEnemy = Game.enemies[i];
+                                    currentEnemy.die();
+                                }
+                            }
+                            if (Round >= 3) {
+                                var currentBoss = Game.Boss;
+                                currentBoss.draw();
+                                currentBoss.update();
+                                if (Game.currentFrame % currentBoss.shootingSpeed === 0) {
+                                    currentBoss.shoot();
+                                }
+                            }
+                            for (var x in Game.enemyBullets) {
+                                Game.enemyBullets[x].draw();
+                                Game.enemyBullets[x].update();
+                            }
+                            for (var z in Game.bullets) {
+                                Game.bullets[z].draw();
+                                Game.bullets[z].update();
+                            }
+                            if (Game.player.invincible) {
+                                if (Game.currentFrame % 20 === 0) {
+                                    Game.player.draw();
+                                }
+                            }
+                            else {
+                                Game.player.draw();
+                            }
+
+                            for (var i in Game.particles) {
+                                Game.particles[i].draw();
+                            }
+                            Game.player.update();
+                            Game.updateScore();
+                            Game.currentFrame = Game.requestAnimationFrame.call(window, Game.loop);
                         }
                     }
-                }
-                else if(Round==3){
-                    for(var i in Game.enemies){
-                        var currentEnemy = Game.enemies[i];
-                        currentEnemy.die();
-                    }
-                }
-                if(Round>=3){
-                    var currentBoss = Game.Boss;
-                    currentBoss.draw();
-                    currentBoss.update();
-                    if(Game.currentFrame % currentBoss.shootingSpeed === 0){
-                        currentBoss.shoot();
-                    }
-                }
-                for(var x in Game.enemyBullets){
-                    Game.enemyBullets[x].draw();
-                    Game.enemyBullets[x].update();
-                }
-                for(var z in Game.bullets){
-                    Game.bullets[z].draw();
-                    Game.bullets[z].update();
-                }
-                if(Game.player.invincible){
-                    if(Game.currentFrame % 20 === 0){
-                        Game.player.draw();
-                    }
-                } 
-                else {
-                    Game.player.draw();
-                }
-    
-            for(var i in Game.particles){
-              Game.particles[i].draw();
-            }
-                Game.player.update();
-                Game.updateScore();
-                Game.currentFrame = Game.requestAnimationFrame.call(window, Game.loop);
-            }
-        }
-    
-    };
-    
-    
-    
-    
-    
-    //플레이어값 설정
-    var Player = function(){
-        this.width = 30;
-        this.height = 30;
-        this.x = Game.c.width/2 - this.width/2;
-        this.y = Game.c.height - this.height;
-        this.movingLeft = false;
-        this.movingRight = false;
-        this.movingUp = false;
-        this.movingDown = false;
-        this.speed = 3;
-        this.invincible = false;
-        this.color = "white";
-    };
-    
-    
-    Player.prototype.die = function(){
-        if(Game.life < Game.maxLives){
-            Game.invincibleMode(2000);  
-             Game.life++;
-             power=1;
-             kill=0;
-             Game.bomb=3;
-        } else {
-            Game.pause();
-            Game.gameOver();
-        }
-    };
-    
-    //캐릭터 그림 생성
-    Player.prototype.draw = function(){
-        var img=new Image();
-        img.src="plane.png";
-        Game.ctx.drawImage(img,this.x, this.y, this.width, this.height);
-    };
-    
-    
-    Player.prototype.update = function(){
-        if(this.movingLeft && this.x > 0){
-            this.x -= this.speed;
-        }
-        if(this.movingRight && this.x + this.width < Game.c.width){
-            this.x += this.speed;
-        }
-        if(this.movingUp && this.y > 0){
-            this.y -= this.speed;
-        }
-        if(this.movingDown && this.y + this.height < Game.c.height){
-            this.y += this.speed;
-        }       
-        if(Game.shooting && Game.currentFrame % 10 === 0){
-            this.shoot();
-        }
-        for(var i in Game.enemyBullets){
-            var currentBullet = Game.enemyBullets[i];
-            if(Game.collision(currentBullet, this) && !Game.player.invincible){
-                this.die();
-                delete Game.enemyBullets[i];
-            }
-        }
-    };
-    
-    
-    Player.prototype.shoot = function(){
-        
-            Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width/2,this.y+this.height/2);
-            Game.bulletIndex++; 
-        if(power >=2){
-        Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width/2+ 5,this.y+this.height/2);
-        Game.bulletIndex++; 
-        }
-        if(  power == 3){
-            Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width/2- 5,this.y+this.height/2);
-            Game.bulletIndex++; 
-        }
-    };
-    
-    
-    
-    
-    
-    
-    var Bullet = function(x,y){  
-        this.width = 3;
-        this.height = 6;
-        this.x = x;
-        //this.y = Game.c.height - 10;
-        this.y = y;
-        this.vy = 4;
-        this.index = Game.bulletIndex;
-        this.active = true;
-        this.color = "white";
-        
-    };
-    
-    
-    Bullet.prototype.draw = function(){
-        Game.ctx.fillStyle = this.color;
-        Game.ctx.fillRect(this.x, this.y, this.width, this.height);
-    };
-    
-    
-    Bullet.prototype.update = function(){
-        this.y -= this.vy;
-        if(this.y < 0){
-            delete Game.bullets[this.index];
-        }
-    };
-    
-    //적 생성
-    var Enemy = function(){
-        Game.enemiesAlive++;
-        this.width = 30;
-        this.height = 30;
-        this.x = Game.random(0, (Game.c.width - this.width));
-        this.y = Game.random(0, 40);
-        this.vy = Game.random(1, 6) * .1;
-        this.index = Game.enemyIndex;
-        this.Colid=0;//총알이나 폭탄에 의한 제거인지 확인
-        this.speed = Game.random(1, 3);
-        this.shootingSpeed = Game.random(50, 80);
-        this.movingLeft = Math.random() < 0.5 ? true : false;
-        this.color = "hsl("+ Game.random(0, 360) +", 60%, 50%)";
-        Game.enemies[Game.enemyIndex] = this;
-        Game.enemyIndex++;
-        
-    };
-    
-    
-    Enemy.prototype.draw = function(){
-        var img=new Image();
-        img.src="enemy.png";
-        Game.ctx.drawImage(img,this.x, this.y, this.width, this.height);
-    };
-        
-    Enemy.prototype.update = function(){
-        if(this.movingLeft){
-            if(this.x > 0){
-                this.x -= this.speed;
-                this.y += this.vy;
-            } else {
-                this.movingLeft = false;
-            }
-        } 
-        else {
-            if(this.x + this.width < Game.c.width){
-                this.x += this.speed;
-                this.y += this.vy;
-            } else {
-                this.movingLeft = true;
-            }
-        }
-        if(this.y>=(Game.c.height))this.die();
-        for(var i in Game.bullets){
-            var currentBullet = Game.bullets[i];
-            if(Game.collision(currentBullet, this)){
-                this.Colid=1;
-                this.die();                
-                delete Game.bullets[i];
-            }
-        } 
-    };
-    
-    Enemy.prototype.die = function(){
-        if(this.Colid==1){
-            this.explode();
-            kill++;
-            if(kill>=10&&kill<20)power=2;
-            if(kill>=20)power=3;
-            Game.score += 15;
-            this.Colid=0;
-        }
-        delete Game.enemies[this.index];
-        if(Game.enemiesAlive<=0){
-            Game.enemiesAlive++;
-        }
-        else Game.enemiesAlive--;
-        if(Round!=3){
-            if(Game.enemiesAlive<Game.maxEnemies){
-                setTimeout(function(){
-                    new Enemy();
-                }, 2000);             
-            }
-        }
-    };
-    
-    Enemy.prototype.explode = function(){
-        for(var i=0; i<Game.maxParticles; i++){
-        new Particle(this.x + this.width/2, this.y, this.color);
-      }
-    };
-    
-    Enemy.prototype.shoot = function(){
-        new EnemyBullet(this.x + this.width/2, this.y, this.color);
-    };
-    
-    var EnemyBullet = function(x, y, color){
-        this.width = 3;
-        this.height = 6;
-        this.x = x;
-        this.y = y;
-        this.vy = 2;
-        this.color = color;
-        this.index = Game.enemyBulletIndex;
-        Game.enemyBullets[Game.enemyBulletIndex] = this;
-        Game.enemyBulletIndex++;
-    };
-    
-    EnemyBullet.prototype.draw = function(){
-        Game.ctx.fillStyle = this.color;
-        Game.ctx.fillRect(this.x, this.y, this.width, this.height);
-    };
-    
-    EnemyBullet.prototype.update = function(){
-        this.y += this.vy;
-        if(this.y > Game.c.height){
-            delete Game.enemyBullets[this.index];
-        }
-    };
-    
-    
-    
-    //터지는 모션
-    var Particle = function(x, y, color){
-        this.x = x;
-        this.y = y;
-        this.vx = Game.random(-5, 5);
-        this.vy = Game.random(-5, 5);
-        this.color = color;
-        Game.particles[Game.particleIndex] = this;
-        this.id = Game.particleIndex;
-        Game.particleIndex++;
-        this.maxlife = 100;
-        this.life = 0;
-        this.gravity = .1;
-        this.size = 30;
-      }
-    
-      Particle.prototype.draw = function(){
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vy += this.gravity;
-        this.size *= .89;
-        Game.ctx.fillStyle = this.color;
-        Game.ctx.fillRect(this.x, this.y, this.size, this.size);
-        this.life++;
-        if(this.life >= this.maxlife){
-          delete Game.particles[this.id];
-        }
-      };
-    
-    //보스
-      var Boss = function(){
-        this.width = 100;
-        this.height = 100;
-        this.upway=0;
-        this.x = Game.random(0, (Game.c.width - this.width));
-        this.y = 0
-        this.vy = 0.3;
-        hp=2000;
-        this.speed = 1;
-        this.shootingSpeed = 60;
-        this.movingLeft = Math.random() < 0.5 ? true : false;        
-        this.color = "hsl("+ Game.random(0, 360) +", 60%, 50%)";
-        Game.Boss=this;
-    };    
-    
-    Boss.prototype.draw = function(){
-        var img=new Image();
-        img.src="Boss.png";
-        Game.ctx.drawImage(img,this.x, this.y, this.width, this.height);
-    };
-        
-    Boss.prototype.update = function(){
-        if(this.movingLeft){
-            if(this.y<=0)this.upway=0;
-            if(this.y>150)this.upway=1;
-            if(this.x > 0){
-                this.x -= this.speed;
-                if(this.upway==0){
-                    this.y += this.vy;
-                }
-                else{
-                    this.y -= this.vy;
-                }
-            } else {
-                this.movingLeft = false;
-            }
-        } else {
-            if(this.x + this.width < Game.c.width){
-                if(this.y<=0)this.upway=0;
-                if(this.y>150)this.upway=1;
-                this.x += this.speed;
-                if(this.upway==0){
-                    this.y += this.vy;
-                }
-                else{
-                    this.y -= this.vy;
-                }
-            } else {
-                this.movingLeft = true;
-            }
-        }
-        for(var i in Game.bullets){
-            var currentBullet = Game.bullets[i];
-            if(Game.collision(currentBullet, this)){
-                this.hit();
-                delete Game.bullets[i];
-            }
-        } 
-    };
-    
-    Boss.prototype.hit = function(){
-        this.explode();
-        hp--;
-    };
 
-    Boss.prototype.explode = function(){
-        for(var i=0; i<Game.maxParticles; i++){
-        new Particle(this.x + this.width/2, this.y, this.color);
-      }
-    };
-        
-    Boss.prototype.shoot = function(){
-        new EnemyBullet(this.x + this.width/2, this.y, this.color);
-        new EnemyBullet(this.x + this.width/2 + 15, this.y, this.color);
-        new EnemyBullet(this.x + this.width/2 - 15, this.y, this.color);
-        new EnemyBullet(this.x + this.width/2 - 30, this.y, this.color);
-        new EnemyBullet(this.x + this.width/2 + 30, this.y, this.color);
-    };
-    Game.init();
-    }(window));
-		</script>
-		<article class="intro">
-			<h1 class="title">CONTROL : WASD , SHOOT : SPACE , BOMB : SHIFT</h1>
-		</article>
-	</div>
+                };
+
+
+
+
+
+                //플레이어값 설정
+                var Player = function () {
+                    this.width = 30;
+                    this.height = 30;
+                    this.x = Game.c.width / 2 - this.width / 2;
+                    this.y = Game.c.height - this.height;
+                    this.movingLeft = false;
+                    this.movingRight = false;
+                    this.movingUp = false;
+                    this.movingDown = false;
+                    this.speed = 3;
+                    this.invincible = false;
+                    this.color = "white";
+                };
+
+
+                Player.prototype.die = function () {
+                    if (Game.life < Game.maxLives) {
+                        Game.invincibleMode(2000);
+                        Game.life++;
+                        power = 1;
+                        kill = 0;
+                        Game.bomb = 3;
+                    } else {
+                        Game.pause();
+                        Game.gameOver();
+                    }
+                };
+
+                //캐릭터 그림 생성
+                Player.prototype.draw = function () {
+                    var img = new Image();
+                    img.src = "plane.png";
+                    Game.ctx.drawImage(img, this.x, this.y, this.width, this.height);
+                };
+
+
+                Player.prototype.update = function () {
+                    if (this.movingLeft && this.x > 0) {
+                        this.x -= this.speed;
+                    }
+                    if (this.movingRight && this.x + this.width < Game.c.width) {
+                        this.x += this.speed;
+                    }
+                    if (this.movingUp && this.y > 0) {
+                        this.y -= this.speed;
+                    }
+                    if (this.movingDown && this.y + this.height < Game.c.height) {
+                        this.y += this.speed;
+                    }
+                    if (Game.shooting && Game.currentFrame % 10 === 0) {
+                        this.shoot();
+                    }
+                    for (var i in Game.enemyBullets) {
+                        var currentBullet = Game.enemyBullets[i];
+                        if (Game.collision(currentBullet, this) && !Game.player.invincible) {
+                            this.die();
+                            delete Game.enemyBullets[i];
+                        }
+                    }
+                };
+
+
+                Player.prototype.shoot = function () {
+
+                    Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width / 2, this.y + this.height / 2);
+                    Game.bulletIndex++;
+                    if (power >= 2) {
+                        Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width / 2 + 5, this.y + this.height / 2);
+                        Game.bulletIndex++;
+                    }
+                    if (power == 3) {
+                        Game.bullets[Game.bulletIndex] = new Bullet(this.x + this.width / 2 - 5, this.y + this.height / 2);
+                        Game.bulletIndex++;
+                    }
+                };
+
+
+
+
+
+
+                var Bullet = function (x, y) {
+                    this.width = 3;
+                    this.height = 6;
+                    this.x = x;
+                    this.y = y;
+                    this.vy = 4;
+                    this.index = Game.bulletIndex;
+                    this.active = true;
+                    this.color = "white";
+
+                };
+
+
+                Bullet.prototype.draw = function () {
+                    Game.ctx.fillStyle = this.color;
+                    Game.ctx.fillRect(this.x, this.y, this.width, this.height);
+                };
+
+
+                Bullet.prototype.update = function () {
+                    this.y -= this.vy;
+                    if (this.y < 0) {
+                        delete Game.bullets[this.index];
+                    }
+                };
+
+                //적 생성
+                var Enemy = function () {
+
+                    this.width = 30;
+                    this.height = 30;
+                    this.x = Game.random(0, (Game.c.width - this.width));
+                    this.y = Game.random(0, 40);
+                    this.vy = Game.random(1, 6) * .1;
+                    this.index = Game.enemyIndex;
+                    this.Colid = 0;//총알이나 폭탄에 의한 제거인지 확인
+                    this.speed = Game.random(1, 3);
+                    this.shootingSpeed = Game.random(50, 80);
+                    this.movingLeft = Math.random() < 0.5 ? true : false;
+                    this.color = "hsl(" + Game.random(0, 360) + ", 60%, 50%)";
+                    Game.enemies[Game.enemyIndex] = this;
+                    Game.enemyIndex++;
+                    Game.enemiesAlive++;
+                    if(Game.enemiesAlive>Game.maxEnemies)this.die();
+                };
+
+
+                Enemy.prototype.draw = function () {
+                    var img = new Image();
+                    img.src = "enemy.png";
+                    Game.ctx.drawImage(img, this.x, this.y, this.width, this.height);
+                };
+
+                Enemy.prototype.update = function () {
+                    if (this.movingLeft) {
+                        if (this.x > 0) {
+                            this.x -= this.speed;
+                            this.y += this.vy;
+                        } else {
+                            this.movingLeft = false;
+                        }
+                    }
+                    else {
+                        if (this.x + this.width < Game.c.width) {
+                            this.x += this.speed;
+                            this.y += this.vy;
+                        } else {
+                            this.movingLeft = true;
+                        }
+                    }
+                    if (this.y >= (Game.c.height)) this.die();
+                    for (var i in Game.bullets) {
+                        var currentBullet = Game.bullets[i];
+                        if (Game.collision(currentBullet, this)) {
+                            this.Colid = 1;
+                            this.die();
+                            delete Game.bullets[i];
+                        }
+                    }
+                };
+
+                Enemy.prototype.die = function () {
+                    if (this.Colid == 1) {
+                        this.explode();
+                        kill++;
+                        if (kill >= 10 && kill < 20) power = 2;
+                        if (kill >= 20) power = 3;
+                        Game.score += 15;
+                        this.Colid = 0;
+                    }
+                    delete Game.enemies[this.index];
+                    if (Game.enemiesAlive <= 0) {
+                        Game.enemiesAlive = 0;
+                    }
+                    else Game.enemiesAlive=Game.enemiesAlive-1;
+                    if (Round != 3) {
+                        if (Game.enemiesAlive < Game.maxEnemies) {
+                            setTimeout(function () {
+                                new Enemy();
+                            }, 2000);
+                            
+                        }
+                        else return;
+                    }
+                };
+
+                Enemy.prototype.explode = function () {
+                    for (var i = 0; i < Game.maxParticles; i++) {
+                        new Particle(this.x + this.width / 2, this.y, this.color);
+                    }
+                };
+
+                Enemy.prototype.shoot = function () {
+                    new EnemyBullet(this.x + this.width / 2, this.y, this.color);
+                };
+
+                var EnemyBullet = function (x, y, color) {
+                    this.width = 3;
+                    this.height = 6;
+                    this.x = x;
+                    this.y = y;
+                    this.vy = 2;
+                    this.color = color;
+                    this.index = Game.enemyBulletIndex;
+                    Game.enemyBullets[Game.enemyBulletIndex] = this;
+                    Game.enemyBulletIndex++;
+                };
+
+                EnemyBullet.prototype.draw = function () {
+                    Game.ctx.fillStyle = this.color;
+                    Game.ctx.fillRect(this.x, this.y, this.width, this.height);
+                };
+
+                EnemyBullet.prototype.update = function () {
+                    this.y += this.vy;
+                    if (this.y > Game.c.height) {
+                        delete Game.enemyBullets[this.index];
+                    }
+                };
+
+
+
+                //터지는 모션
+                var Particle = function (x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.vx = Game.random(-5, 5);
+                    this.vy = Game.random(-5, 5);
+                    this.color = color;
+                    Game.particles[Game.particleIndex] = this;
+                    this.id = Game.particleIndex;
+                    Game.particleIndex++;
+                    this.maxlife = 100;
+                    this.life = 0;
+                    this.gravity = .1;
+                    this.size = 30;
+                }
+
+                Particle.prototype.draw = function () {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vy += this.gravity;
+                    this.size *= .89;
+                    Game.ctx.fillStyle = this.color;
+                    Game.ctx.fillRect(this.x, this.y, this.size, this.size);
+                    this.life++;
+                    if (this.life >= this.maxlife) {
+                        delete Game.particles[this.id];
+                    }
+                };
+
+                //보스
+                var Boss = function () {
+                    this.width = 100;
+                    this.height = 100;
+                    this.upway = 0;
+                    this.x = Game.random(0, (Game.c.width - this.width));
+                    this.y = 0
+                    this.vy = 0.3;
+                    hp = 2000;
+                    this.speed = 1;
+                    this.shootingSpeed = 60;
+                    this.movingLeft = Math.random() < 0.5 ? true : false;
+                    this.color = "hsl(" + Game.random(0, 360) + ", 60%, 50%)";
+                    Game.Boss = this;
+                };
+
+                Boss.prototype.draw = function () {
+                    var img = new Image();
+                    img.src = "Boss.png";
+                    Game.ctx.drawImage(img, this.x, this.y, this.width, this.height);
+                };
+
+                Boss.prototype.update = function () {
+                    if (this.movingLeft) {
+                        if (this.y <= 0) this.upway = 0;
+                        if (this.y > 150) this.upway = 1;
+                        if (this.x > 0) {
+                            this.x -= this.speed;
+                            if (this.upway == 0) {
+                                this.y += this.vy;
+                            }
+                            else {
+                                this.y -= this.vy;
+                            }
+                        } else {
+                            this.movingLeft = false;
+                        }
+                    } else {
+                        if (this.x + this.width < Game.c.width) {
+                            if (this.y <= 0) this.upway = 0;
+                            if (this.y > 150) this.upway = 1;
+                            this.x += this.speed;
+                            if (this.upway == 0) {
+                                this.y += this.vy;
+                            }
+                            else {
+                                this.y -= this.vy;
+                            }
+                        } else {
+                            this.movingLeft = true;
+                        }
+                    }
+                    for (var i in Game.bullets) {
+                        var currentBullet = Game.bullets[i];
+                        if (Game.collision(currentBullet, this)) {
+                            this.hit();
+                            delete Game.bullets[i];
+                        }
+                    }
+                };
+
+                Boss.prototype.hit = function () {
+                    this.explode();
+                    hp--;
+                };
+
+                Boss.prototype.explode = function () {
+                    for (var i = 0; i < Game.maxParticles; i++) {
+                        new Particle(this.x + this.width / 2, this.y, this.color);
+                    }
+                };
+
+                Boss.prototype.shoot = function () {
+                    new EnemyBullet(this.x + this.width / 2, this.y, this.color);
+                    new EnemyBullet(this.x + this.width / 2 + 15, this.y, this.color);
+                    new EnemyBullet(this.x + this.width / 2 - 15, this.y, this.color);
+                    new EnemyBullet(this.x + this.width / 2 - 30, this.y, this.color);
+                    new EnemyBullet(this.x + this.width / 2 + 30, this.y, this.color);
+                };
+                Game.init();
+            }(window));
+        </script>
+        <article class="intro">
+            <h1 class="title">CONTROL : WASD , SHOOT : SPACE , BOMB : SHIFT</h1>
+        </article>
+    </div>
 </div>
