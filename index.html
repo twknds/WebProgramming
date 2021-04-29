@@ -20,6 +20,7 @@
             this.c.width = this.c.width;
             this.c.height = this.c.height;
             this.ctx = this.c.getContext("2d");
+            this.killcount=0;
             Round=1; // 라운드
             RoundCount=0; // 라운드 한번만 체킹되ㅑ게 하는 플래그
             hp=2000; // 보스 체력
@@ -27,7 +28,7 @@
             power=1;
             bosscount=0;
             clear=0;
-            this.color = "rgba(10,10,10,.7)";
+            this.color = "rgba(0,0,0,.7)";
             this.bullets = [];            
             this.enemyBullets = [];
             this.enemies = [];
@@ -242,15 +243,15 @@
           if(this.score>200 && RoundCount==0){
             RoundCount=1;
             Round=2;              
-              Game.maxEnemies=9;
-              var temp=Game.enemiesAlive;
-              for(var i=temp;i<Game.maxEnemies;i++){
+            Game.maxEnemies=9;
+            var temp=Game.enemiesAlive;
+            for(var i=temp;i<Game.maxEnemies;i++){
                 if(Game.enemiesAlive<Game.maxEnemies){
                     setTimeout(function(){
                         new Enemy();
                     }, 2000);
                 }
-              }
+            }
           }
           else if(this.score>1000 && RoundCount==1){
             RoundCount=2;
@@ -297,16 +298,23 @@
         },
       //계속해서 Game Function들 호출해주는 Function
         loop: function(){
+            Game.killcount=0;
             if(!Game.paused){
-                Game.clear();
-                
+                Game.clear();                
                 if(Round!=3){
+                    if(Game.maxEnemies<Game.enemiesAlive)Game.killcount=Game.enemiesAlive-Game.maxEnemies;
                     for(var i in Game.enemies){
                         var currentEnemy = Game.enemies[i];
-                        currentEnemy.draw();
-                        currentEnemy.update();
-                        if(Game.currentFrame % currentEnemy.shootingSpeed === 0){
-                            currentEnemy.shoot();
+                        if(Game.killcount==0){ 
+                            currentEnemy.draw();
+                            currentEnemy.update();
+                            if(Game.currentFrame % currentEnemy.shootingSpeed === 0){
+                                currentEnemy.shoot();
+                            }
+                        }
+                        else{   // 비동기처리로인해서 마리수가 초과시 자동삭제기능
+                            currentEnemy.die();
+                            Game.killcount--;
                         }
                     }
                 }
@@ -474,7 +482,7 @@
         this.y = Game.random(0, 40);
         this.vy = Game.random(1, 6) * .1;
         this.index = Game.enemyIndex;
-        this.Colid=0;
+        this.Colid=0;//총알이나 폭탄에 의한 제거인지 확인
         this.speed = Game.random(1, 3);
         this.shootingSpeed = Game.random(50, 80);
         this.movingLeft = Math.random() < 0.5 ? true : false;

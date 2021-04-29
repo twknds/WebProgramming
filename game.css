@@ -1,7 +1,7 @@
 body {
   min-height: 100%;
   max-width: 100%;
-  background: rgb(27, 27, 25);
+  background: rgb(24, 24, 20);
 }
 canvas {
   position: relative;
