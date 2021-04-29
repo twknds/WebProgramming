@@ -232,9 +232,6 @@
                         this.ctx.fillText("Score: " + Game.score, 10, 400);
                         this.ctx.fillText("Lives: " + (Game.maxLives - Game.life), 10, 420);
                         this.ctx.fillText("Bomb: " + Game.bomb, 10, 440);
-                        this.ctx.fillText("Max: " + Game.maxEnemies, 10, 460);
-                        this.ctx.fillText("alive: " + Game.enemiesAlive, 10, 480);
-                        this.ctx.fillText("RC: " + RoundCount, 10, 500);
                         this.ctx.font = "40px Lato, fantasy";
 
                         if (Round < 3) {
@@ -257,7 +254,7 @@
                                 clear = 1;
                                 Game.gameOver();
                             }
-                            if (Game.score > 1000 && RoundCount == 0 && Round== 1) {//1천점 이상시 2라운드
+                            if (Game.score > 1500 && RoundCount == 0 && Round== 1) {//1천점 이상시 2라운드
                                 RoundCount = 1;
                                 Round = 2;
                                 Game.maxEnemies = 9;
@@ -269,7 +266,7 @@
                                     }
                                 }
                             }
-                            else if (Game.score > 2500 && RoundCount == 1 && Round==2) { // 보스라운드 진입
+                            else if (Game.score > 3000 && RoundCount == 1 && Round==2) { // 보스라운드 진입
                                 RoundCount = 2;
                                 Round = 3;
                                 for (var i in Game.enemies) {
@@ -541,8 +538,8 @@
                     if (this.Colid == 1) {
                         this.explode();
                         kill++;
-                        if (kill >= 10 && kill < 20) power = 2;
-                        if (kill >= 20) power = 3;
+                        if (kill >= 20 && kill < 40) power = 2;
+                        if (kill >= 40) power = 3;
                         Game.score += 15;
                         this.Colid = 0;
                     }
